@@ -2,84 +2,228 @@
 <html lang="fi">
 <head>
     <meta charset="UTF-8">
-    <title>Suomalaisten Nisäkkäiden Tunnistusharjoitus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAAT25 Nisäkkäät-harjoitus</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #2c2c2c;
+            color: white;
         }
-        .animal {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .animal img {
-            max-width: 100%;
+        img {
+            width: 500px;
             height: auto;
-            border-radius: 5px;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+            cursor: pointer;
         }
-        .animal h2 {
-            margin-top: 0;
+        button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 25px;
+            background-color: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        #score {
+            font-size: 20px;
+            margin-top: 15px;
+        }
+        #options {
+            display: none;
+        }
+        #answerInput {
+            margin-top: 20px;
+            font-size: 20px;
+            padding: 8px;
+            width: 60%;
+            background-color: #444;
+            color: white;
+            border: 1px solid #666;
+        }
+        #answerInstruction {
+            font-size: 18px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Suomalaisten Nisäkkäiden Tunnistusharjoitus</h1>
-
-    <div class="animal">
-        <h2>Ahma (<em>Gulo gulo</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Gulo_gulo_-Norway-8.jpg" alt="Ahma">
-        <p><strong>Helposti sekoitettavissa:</strong> Karhu</p>
-        <p><strong>Tunnistusvinkki:</strong> Ahma on pienempi ja ketterämpi kuin karhu, ja sillä on tummempi turkki sekä vaalea raita kyljissä.</p>
+    <h1>LAAT25 Nisäkkäät-harjoitus</h1>
+    <div id="quiz">
+        <img id="animalImage" src="" alt="Nisäkkään kuva" onclick="showOptions()">
+        <div id="options">
+            <button onclick="checkAnswer(0)"></button>
+            <button onclick="checkAnswer(1)"></button>
+            <button onclick="checkAnswer(2)"></button>
+        </div>
+        <p id="result"></p>
+        <p id="score"></p>
+        <p id="answerInstruction">Klikkaamalla kuvaa saat vaihtoehdot, tai voit kirjoittaa nisäkkään nimen suoraan tähän:</p>
+        <input type="text" id="answerInput" placeholder="Kirjoita nisäkkään nimi ja paina Enter">
     </div>
 
-    <div class="animal">
-        <h2>Hilleri (<em>Mustela putorius</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Mustela_putorius_-British_Wildlife_Centre-8a.jpg" alt="Hilleri">
-        <p><strong>Helposti sekoitettavissa:</strong> Kärppä</p>
-        <p><strong>Tunnistusvinkki:</strong> Hillerillä on tummempi turkki ja vaalea kuono verrattuna kärppään.</p>
-    </div>
+    <script>
+        const mammalsByCategory = {
+            "Pienet petoeläimet": ["ahma", "hilleri", "kärppä", "lumikko", "minkki", "näätä", "saukko"],
+            "Suuret petoeläimet": ["karhu", "ilves", "susi", "naali", "supikoira"],
+            "Jyrsijät ja myyrät": ["kotihiiri", "peltomyyrä", "metsämyyrä", "rotta", "vesimyyrä", "piisami", "majava"],
+            "Peura- ja hirvieläimet": ["hirvi", "metsäpeura", "valkohäntäpeura", "poro"],
+            "Jänikset ja niiden kaltaiset": ["jänis", "rusakko"],
+            "Pienet nisäkkäät": ["metsäpäästäinen", "siili", "tunturisopuli"],
+            "Oravamaiset ja liitäjät": ["orava", "liito-orava"],
+            "Lepakot ja vesinisäkkäät": ["pohjanlepakko", "hylje", "norppa"]
+        };
 
-    <div class="animal">
-        <h2>Hirvi (<em>Alces alces</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Alces_alces_2.jpg" alt="Hirvi">
-        <p><strong>Helposti sekoitettavissa:</strong> Metsäpeura</p>
-        <p><strong>Tunnistusvinkki:</strong> Hirvellä on suuremmat sarvet ja pidemmät jalat kuin metsäpeuralla.</p>
-    </div>
+        const mammalNameMappings = {
+            "hilleri": "Mustela putorius",
+            "karhu": "Ursus arctos",
+            "hirvi": "Alces alces",
+            "susi": "Canis lupus",
+            "jänis": "Lepus timidus",
+            "majava": "Castor fiber",
+            "liito-orava": "Pteromys volans"
+        };
 
-    <div class="animal">
-        <h2>Hylje (<em>Pusa hispida</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Pusa_hispida_hispida.jpg" alt="Hylje">
-        <p><strong>Helposti sekoitettavissa:</strong> Norppa</p>
-        <p><strong>Tunnistusvinkki:</strong> Norpalla on pyöreämpi pää ja lyhyempi kuono verrattuna muihin hyljelajeihin.</p>
-    </div>
+        const allMammals = Object.values(mammalsByCategory).flat();
+        let shuffledMammals = [];
+        let currentMammal;
+        let currentCategoryMammals = [];
+        let correctAnswerIndex;
+        let questionIndex = 0;
+        let correctCount = 0;
+        let totalPoints = 0;
 
-    <div class="animal">
-        <h2>Ilves (<em>Lynx lynx</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Lynx_lynx_poing.jpg" alt="Ilves">
-        <p><strong>Helposti sekoitettavissa:</strong> Kissa</p>
-        <p><strong>Tunnistusvinkki:</strong> Ilveksellä on tupsukorvat ja lyhyt häntä, toisin kuin kotikissalla.</p>
-    </div>
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-    <div class="animal">
-        <h2>Karhu (<em>Ursus arctos</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/Ursus_arctos_-_Kamchatka.jpg" alt="Karhu">
-        <p><strong>Helposti sekoitettavissa:</strong> Ahma</p>
-        <p><strong>Tunnistusvinkki:</strong> Karhu on huomattavasti suurempi ja massiivisempi kuin ahma.</p>
-    </div>
+        function getCategory(name) {
+            for (const [category, animals] of Object.entries(mammalsByCategory)) {
+                if (animals.includes(name)) return { category, animals };
+            }
+            return null;
+        }
 
-    <div class="animal">
-        <h2>Jänis (<em>Lepus timidus</em>)</h2>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Lepus_timidus_-_Finland.jpg" alt="Jänis">
-        <p><strong>Helposti sekoitettavissa:</strong> Rusakko</p>
-        <p><strong>Tunnistusvinkki:</strong> Jäniksellä on lyhyemmät korvat ja valkoinen talviturkki, toisin kuin rusakolla.</p>
-    </div>
+        function getRandomOptionsFromSameCategory(correct, categoryAnimals) {
+            const options = [correct];
+            while (options.length < 3) {
+                const random = categoryAnimals[Math.floor(Math.random() * categoryAnimals.length)];
+                if (!options.includes(random)) options.push(random);
+            }
+            return shuffle(options);
+        }
 
-    <!-- Lisää muita eläimiä samalla rakenteella -->
+        async function fetchWikimediaImage(name) {
+            const searchTerm = mammalNameMappings[name] || name;
+            const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&pithumbsize=500&titles=${encodeURIComponent(searchTerm)}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const pages = data.query.pages;
+                const firstPage = Object.values(pages)[0];
+                return firstPage?.thumbnail?.source || null;
+            } catch {
+                return null;
+            }
+        }
 
+        async function fetchiNaturalistImage(name) {
+            const searchTerm = mammalNameMappings[name] || name;
+            const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(searchTerm)}&rank=species`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data.results[0]?.default_photo?.medium_url || null;
+            } catch {
+                return null;
+            }
+        }
+
+        async function findAnimalImage(name) {
+            if (name === "karhu") return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Ursus_arctos_-_Norway.jpg/640px-Ursus_arctos_-_Norway.jpg";
+            if (name === "susi") return "https://upload.wikimedia.org/wikipedia/commons/1/1d/Wolf_aka.jpg";
+            if (name === "liito-orava") return "https://upload.wikimedia.org/wikipedia/commons/1/1b/Siberian_flying_squirrel.jpg";
+
+            let url = await fetchWikimediaImage(name);
+            if (url) return url;
+
+            url = await fetchiNaturalistImage(name);
+            if (url) return url;
+
+            return "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg";
+        }
+
+        async function loadQuiz() {
+            if (questionIndex >= shuffledMammals.length) {
+                const message = `Sait ${correctCount}/${shuffledMammals.length} oikein ja yhteensä ${totalPoints.toFixed(1)} pistettä!`;
+                document.getElementById('quiz').innerHTML = `<h2>${message}</h2>`;
+                return;
+            }
+
+            currentMammal = shuffledMammals[questionIndex];
+            const { category, animals } = getCategory(currentMammal);
+            currentCategoryMammals = animals;
+            const imageUrl = await findAnimalImage(currentMammal);
+            document.getElementById('animalImage').src = imageUrl;
+            document.getElementById('result').textContent = '';
+            document.getElementById('score').textContent = `Kysymys ${questionIndex + 1}/${shuffledMammals.length} — Oikein: ${correctCount} — Pisteet: ${totalPoints.toFixed(1)}`;
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('answerInput').value = '';
+        }
+
+        function showOptions() {
+            const options = getRandomOptionsFromSameCategory(currentMammal, currentCategoryMammals);
+            correctAnswerIndex = options.indexOf(currentMammal);
+            const buttons = document.getElementById('options').children;
+            buttons[0].textContent = options[0];
+            buttons[1].textContent = options[1];
+            buttons[2].textContent = options[2];
+            document.getElementById('options').style.display = 'block';
+        }
+
+        function checkAnswer(index) {
+            const buttons = document.getElementById('options').children;
+            if (buttons[index].textContent === currentMammal) {
+                document.getElementById('result').textContent = 'Oikein!';
+                correctCount++;
+                totalPoints += 0.5;
+            } else {
+                document.getElementById('result').textContent = `Väärin! Oikea vastaus oli: ${currentMammal}`;
+            }
+            questionIndex++;
+            setTimeout(loadQuiz, 1500);
+        }
+
+        document.getElementById('answerInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const userInput = this.value.trim().toLowerCase();
+                if (userInput === currentMammal.toLowerCase()) {
+                    document.getElementById('result').textContent = 'OIKEIN!';
+                    correctCount++;
+                    totalPoints += 1;
+                } else {
+                    document.getElementById('result').textContent = `Väärin! Oikea vastaus oli: ${currentMammal}`;
+                }
+                questionIndex++;
+                setTimeout(loadQuiz, 1500);
+            }
+        });
+
+        window.onload = () => {
+            shuffledMammals = shuffle([...allMammals]);
+            loadQuiz();
+        };
+    </script>
 </body>
 </html>
