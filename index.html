@@ -1,163 +1,85 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAAT25 Nisäkäsharjoitus</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-      background-color: #2c2c2c;
-      color: white;
-    }
-    img {
-      width: 500px;
-      height: auto;
-      border: 2px solid #000;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-    button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 25px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #555;
-    }
-    #score {
-      font-size: 20px;
-      margin-top: 15px;
-    }
-    #options {
-      display: none;
-    }
-    #answerInput {
-      margin-top: 20px;
-      font-size: 20px;
-      padding: 8px;
-      width: 60%;
-      background-color: #444;
-      color: white;
-      border: 1px solid #666;
-    }
-    #answerInstruction {
-      font-size: 18px;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Suomalaisten Nisäkkäiden Tunnistusharjoitus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .animal {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .animal img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .animal h2 {
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
-  <h1>LAAT25 Nisäkäsharjoitus</h1>
-  <div id="quiz">
-    <img id="birdImage" src="" alt="Eläimen kuva" onclick="showOptions()">
-    <div id="options">
-      <button onclick="checkAnswer(0)"></button>
-      <button onclick="checkAnswer(1)"></button>
-      <button onclick="checkAnswer(2)"></button>
+    <h1>Suomalaisten Nisäkkäiden Tunnistusharjoitus</h1>
+
+    <div class="animal">
+        <h2>Ahma (<em>Gulo gulo</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Gulo_gulo_-Norway-8.jpg" alt="Ahma">
+        <p><strong>Helposti sekoitettavissa:</strong> Karhu</p>
+        <p><strong>Tunnistusvinkki:</strong> Ahma on pienempi ja ketterämpi kuin karhu, ja sillä on tummempi turkki sekä vaalea raita kyljissä.</p>
     </div>
-    <p id="result"></p>
-    <p id="score"></p>
-    <p id="answerInstruction">Klikkaamalla kuvaa saat vaihtoehdot, tai voit kirjoittaa eläimen nimen suoraan tähän:</p>
-    <input type="text" id="answerInput" placeholder="Kirjoita eläimen nimi ja paina Enter">
-  </div>
 
-  <script>
-    const mammalsByCategory = {
-      "Pedot": ["ahma", "hilleri", "ilves", "karhu", "kärppä", "lumikko", "minkki", "mäyrä", "näätä", "susi"],
-      "Jyrsijät": ["kotihiiri", "majava", "metsämyyrä", "peltomyyrä", "piisami", "rotta", "vesimyyrä"],
-      "Pienet nisäkkäät": ["metsäpäästäinen", "siili", "tunturisopuli", "pohjanlepakko"],
-      "Kanit ja jänikset": ["jänis", "rusakko"],
-      "Koiraeläimet": ["kettu", "naali", "supikoira"],
-      "Kissat": ["ilves"],
-      "Hirvieläimet": ["hirvi", "metsäpeura", "poro", "valkohäntäpeura"],
-      "Oravat ja sukulaiset": ["orava", "liito-orava"],
-      "Vesinisäkkäät": ["saukko", "norppa", "hylje"]
-    };
+    <div class="animal">
+        <h2>Hilleri (<em>Mustela putorius</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Mustela_putorius_-British_Wildlife_Centre-8a.jpg" alt="Hilleri">
+        <p><strong>Helposti sekoitettavissa:</strong> Kärppä</p>
+        <p><strong>Tunnistusvinkki:</strong> Hillerillä on tummempi turkki ja vaalea kuono verrattuna kärppään.</p>
+    </div>
 
-    const animalNameMappings = {
-      "ahma": "Gulo gulo",
-      "hilleri": "Mustela putorius",
-      "hirvi": "Alces alces",
-      "hylje": "Phoca vitulina",
-      "ilves": "Lynx lynx",
-      "karhu": "Ursus arctos",
-      "jänis": "Lepus timidus",
-      "kettu": "Vulpes vulpes",
-      "kotihiiri": "Mus musculus",
-      "kärppä": "Mustela erminea",
-      "liito-orava": "Pteromys volans",
-      "lumikko": "Mustela nivalis",
-      "majava": "Castor fiber",
-      "metsäpäästäinen": "Sorex araneus",
-      "peltomyyrä": "Microtus agrestis",
-      "metsämyyrä": "Myodes glareolus",
-      "metsäpeura": "Rangifer tarandus fennicus",
-      "minkki": "Neovison vison",
-      "mäyrä": "Meles meles",
-      "naali": "Vulpes lagopus",
-      "norppa": "Pusa hispida",
-      "näätä": "Martes martes",
-      "orava": "Sciurus vulgaris",
-      "piisami": "Ondatra zibethicus",
-      "pohjanlepakko": "Eptesicus nilssonii",
-      "poro": "Rangifer tarandus",
-      "rotta": "Rattus norvegicus",
-      "rusakko": "Lepus europaeus",
-      "saukko": "Lutra lutra",
-      "siili": "Erinaceus europaeus",
-      "supikoira": "Nyctereutes procyonoides",
-      "susi": "Canis lupus",
-      "tunturisopuli": "Lemmus lemmus",
-      "valkohäntäpeura": "Odocoileus virginianus",
-      "vesimyyrä": "Arvicola amphibius"
-    };
+    <div class="animal">
+        <h2>Hirvi (<em>Alces alces</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Alces_alces_2.jpg" alt="Hirvi">
+        <p><strong>Helposti sekoitettavissa:</strong> Metsäpeura</p>
+        <p><strong>Tunnistusvinkki:</strong> Hirvellä on suuremmat sarvet ja pidemmät jalat kuin metsäpeuralla.</p>
+    </div>
 
-    const allMammals = Object.values(mammalsByCategory).flat();
-    let shuffledMammals = [];
-    let currentAnimal;
-    let currentCategoryAnimals = [];
-    let correctAnswerIndex;
-    let questionIndex = 0;
-    let correctCount = 0;
-    let totalPoints = 0;
+    <div class="animal">
+        <h2>Hylje (<em>Pusa hispida</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Pusa_hispida_hispida.jpg" alt="Hylje">
+        <p><strong>Helposti sekoitettavissa:</strong> Norppa</p>
+        <p><strong>Tunnistusvinkki:</strong> Norpalla on pyöreämpi pää ja lyhyempi kuono verrattuna muihin hyljelajeihin.</p>
+    </div>
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
+    <div class="animal">
+        <h2>Ilves (<em>Lynx lynx</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Lynx_lynx_poing.jpg" alt="Ilves">
+        <p><strong>Helposti sekoitettavissa:</strong> Kissa</p>
+        <p><strong>Tunnistusvinkki:</strong> Ilveksellä on tupsukorvat ja lyhyt häntä, toisin kuin kotikissalla.</p>
+    </div>
 
-    function getCategory(animalName) {
-      for (const [category, animals] of Object.entries(mammalsByCategory)) {
-        if (animals.includes(animalName)) return { category, animals };
-      }
-      return null;
-    }
+    <div class="animal">
+        <h2>Karhu (<em>Ursus arctos</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/Ursus_arctos_-_Kamchatka.jpg" alt="Karhu">
+        <p><strong>Helposti sekoitettavissa:</strong> Ahma</p>
+        <p><strong>Tunnistusvinkki:</strong> Karhu on huomattavasti suurempi ja massiivisempi kuin ahma.</p>
+    </div>
 
-    function getRandomOptionsFromSameCategory(correctAnimal, categoryAnimals) {
-      const options = [correctAnimal];
-      while (options.length < 3) {
-        const randomAnimal = categoryAnimals[Math.floor(Math.random() * categoryAnimals.length)];
-        if (!options.includes(randomAnimal)) {
-          options.push(randomAnimal);
-        }
-      }
-      return shuffle(options);
-    }
+    <div class="animal">
+        <h2>Jänis (<em>Lepus timidus</em>)</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Lepus_timidus_-_Finland.jpg" alt="Jänis">
+        <p><strong>Helposti sekoitettavissa:</strong> Rusakko</p>
+        <p><strong>Tunnistusvinkki:</strong> Jäniksellä on lyhyemmät korvat ja valkoinen talviturkki, toisin kuin rusakolla.</p>
+    </div>
 
-    async function fetchWikimediaImage(name) {
-      const searchTerm = animalNameMappings[name] || name;
-      const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&pithumbsize=500&titles=${encodeURIComponent(searchTerm)}`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json
+    <!-- Lisää muita eläimiä samalla rakenteella -->
+
+</body>
+</html>
