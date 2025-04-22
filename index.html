@@ -151,9 +151,10 @@
         }
 
         async function findAnimalImage(name) {
-            if (name === "karhu") return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Ursus_arctos_-_Norway.jpg/640px-Ursus_arctos_-_Norway.jpg";
+            if (name === "karhu") return "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Brown_bear_%28Ursus_arctos%29%2C_Viiksimo%2C_Kainuu_region%2C_Finland%2C_16_June_2018_%2843094873292%29.jpg/1280px-Brown_bear_%28Ursus_arctos%29%2C_Viiksimo%2C_Kainuu_region%2C_Finland%2C_16_June_2018_%2843094873292%29.jpg";
             if (name === "susi") return "https://upload.wikimedia.org/wikipedia/commons/1/1d/Wolf_aka.jpg";
             if (name === "liito-orava") return "https://upload.wikimedia.org/wikipedia/commons/1/1b/Siberian_flying_squirrel.jpg";
+            if (name === "ilves") return "https://www.suurpedot.fi/media/kuvat/ilves/cache/ilves_katselee_hannuhuttu-780x440,c,q=85.jpg";
 
             let url = await fetchWikimediaImage(name);
             if (url) return url;
